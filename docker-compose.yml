@@ -4,10 +4,8 @@ volumes:
    nodered:
    influxdbv2:
    grafana:
-# If conf files are stored in volumes they will persist when 
-# rebuilding the image. and we don't want that.
-#   telegraf:
-#   mosquitto_config:
+   telegraf:
+   mosquitto_config:
    mosquitto_data:
    mosquitto_log:
 
@@ -24,7 +22,7 @@ services:
          - "1883:1883"
       volumes:
          - mosquitto_data:/mosquitto/data 
-#         - mosquitto_config:/mosquitto/config
+         - mosquitto_config:/mosquitto/config
          - mosquitto_log:/mosquitto/log
       restart: on-failure
 
@@ -81,8 +79,8 @@ services:
          - mosquitto
       networks:
          - logger
-#      volumes:
-#         - telegraf:/etc/telegraf:ro
+      volumes:
+         - telegraf:/etc/telegraf:ro
       environment:
          - DOCKER_INFLUXDB_INIT_ORG=${DOCKER_INFLUXDB_INIT_ORG}
          - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=${DOCKER_INFLUXDB_INIT_ADMIN_TOKEN}
