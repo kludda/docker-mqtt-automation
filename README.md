@@ -335,4 +335,5 @@ Edit OS settings
 
 https://superuser.com/questions/1374323/how-do-i-fix-my-sd-card-after-it-was-split-into-multiple-drives-by-windows-lot-c
 
-
+## Inspiration
+https://github.com/ttncat/ttncat-docker-compose was used as a boiler plate for this repo.
