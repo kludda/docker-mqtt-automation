@@ -10,14 +10,14 @@ volumes:
    mosquitto_log:
 
 networks:
-   logger:
+   mqtt_automation:
 
 services:
    mosquitto:
       container_name: mosquitto
       build: ./mosquitto
       networks:
-         - logger
+         - mqtt_automation
       ports:
          - "1883:1883"
       volumes:
@@ -42,7 +42,7 @@ services:
          - DOCKER_MOSQUITTO_PORT=${DOCKER_MOSQUITTO_PORT}
 
       networks:
-         - logger
+         - mqtt_automation
       ports:
          - "1880:1880"
       volumes:
@@ -52,7 +52,7 @@ services:
       image: influxdb
       container_name: influxdb
       networks:
-         - logger
+         - mqtt_automation
       ports:
          - "8086:8086"
       volumes:
@@ -78,7 +78,7 @@ services:
          - influxdb
          - mosquitto
       networks:
-         - logger
+         - mqtt_automation
       volumes:
          - telegraf:/etc/telegraf:ro
       environment:
@@ -97,7 +97,7 @@ services:
       depends_on:
          - influxdb
       networks:
-         - logger
+         - mqtt_automation
       ports:
          - "3000:3000"
       environment:
