@@ -1,5 +1,5 @@
 #!/bin/bash
 
-sed '\|WorkingDirectory|c\WorkingDirectory='$PWD ./mqtt-automation.service
+sed -i '\|WorkingDirectory|c\WorkingDirectory='$PWD ./mqtt-automation.service
 cp mqtt-automation.service /etc/systemd/system/
 systemctl enable mqtt-automation
