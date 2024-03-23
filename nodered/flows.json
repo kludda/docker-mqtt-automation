@@ -1,0 +1,427 @@
+[
+    {
+        "id": "f6f2187d.f17ca8",
+        "type": "tab",
+        "label": "Catch all and write to InfluxDB",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "5f29c2aa74a1924f",
+        "type": "tab",
+        "label": "Read from InfluxDB",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "6c6d5fe4e4a92258",
+        "type": "mqtt-broker",
+        "name": "mosquitto",
+        "broker": "${DOCKER_MOSQUITTO_HOST}",
+        "port": "${DOCKER_MOSQUITTO_PORT}",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "a5437024168e78c2",
+        "type": "mqtt out",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "topic": "influxdb/write",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "6c6d5fe4e4a92258",
+        "x": 830,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "5ed34d346339f354",
+        "type": "mqtt in",
+        "z": "f6f2187d.f17ca8",
+        "name": "Catch all messages with 4 topic levels",
+        "topic": "+/+/+/+",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "6c6d5fe4e4a92258",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 190,
+        "y": 100,
+        "wires": [
+            [
+                "4df30e45c8ebb72d"
+            ]
+        ]
+    },
+    {
+        "id": "4df30e45c8ebb72d",
+        "type": "change",
+        "z": "f6f2187d.f17ca8",
+        "name": "Compose InfluxDB line protocol",
+        "rules": [
+            {
+                "t": "set",
+                "p": "levels",
+                "pt": "msg",
+                "to": "$split(topic, \"/\")\t",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "measurement",
+                "pt": "msg",
+                "to": "levels[2]",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "fieldKey",
+                "pt": "msg",
+                "to": "levels[3]",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "device",
+                "pt": "msg",
+                "to": "levels[1]",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "fieldValue",
+                "pt": "msg",
+                "to": "payload",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "measurement & \",device=\" & device & \" \" & fieldKey & \"=\" & fieldValue",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 550,
+        "y": 100,
+        "wires": [
+            [
+                "869dc3905e7e27b4",
+                "a5437024168e78c2"
+            ]
+        ]
+    },
+    {
+        "id": "93059e525fcc207a",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "Example MQTT message",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "home/device123/thermostat/temperature",
+        "payload": "23",
+        "payloadType": "num",
+        "x": 150,
+        "y": 60,
+        "wires": [
+            [
+                "4df30e45c8ebb72d"
+            ]
+        ]
+    },
+    {
+        "id": "869dc3905e7e27b4",
+        "type": "debug",
+        "z": "f6f2187d.f17ca8",
+        "name": "Debug",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 810,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "ce42daa98b75dd2c",
+        "type": "http request",
+        "z": "5f29c2aa74a1924f",
+        "name": "Query InfluxDB (Do not edit)",
+        "method": "POST",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 400,
+        "y": 220,
+        "wires": [
+            [
+                "8074bd52745275ba"
+            ]
+        ]
+    },
+    {
+        "id": "75a19a2a9044762a",
+        "type": "template",
+        "z": "5f29c2aa74a1924f",
+        "name": "Example Flux query (Edit this)",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "from(bucket: \"{{bucket}}\")\n    |> range(start: -30d)\n    |> filter(fn: (r) => r._measurement == \"thermostat\" and r.device == \"device123\")\n    |> filter(fn: (r) => r._field == \"temperature\")\n    |> last()",
+        "output": "str",
+        "x": 330,
+        "y": 160,
+        "wires": [
+            [
+                "ce42daa98b75dd2c"
+            ]
+        ]
+    },
+    {
+        "id": "13fa2b463f9dfd05",
+        "type": "inject",
+        "z": "5f29c2aa74a1924f",
+        "name": "Example read from InfluxDB",
+        "props": [],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 160,
+        "y": 40,
+        "wires": [
+            [
+                "3f0e34532fb7539a"
+            ]
+        ]
+    },
+    {
+        "id": "cfa298fa9639bdaf",
+        "type": "debug",
+        "z": "5f29c2aa74a1924f",
+        "name": "Result Ok",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 860,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "8074bd52745275ba",
+        "type": "csv",
+        "z": "5f29c2aa74a1924f",
+        "name": "Convert CSV response to Javascript object (Do not edit)",
+        "sep": ",",
+        "hdrin": true,
+        "hdrout": "none",
+        "multi": "mult",
+        "ret": "\\n",
+        "temp": "",
+        "skip": "0",
+        "strings": true,
+        "include_empty_strings": "",
+        "include_null_values": "",
+        "x": 570,
+        "y": 280,
+        "wires": [
+            [
+                "518fed4459cb2871"
+            ]
+        ]
+    },
+    {
+        "id": "3f0e34532fb7539a",
+        "type": "change",
+        "z": "5f29c2aa74a1924f",
+        "name": "Get ENV, set headers & build url (Do not edit)",
+        "rules": [
+            {
+                "t": "set",
+                "p": "host",
+                "pt": "msg",
+                "to": "DOCKER_INFLUXDB_HOST",
+                "tot": "env"
+            },
+            {
+                "t": "set",
+                "p": "port",
+                "pt": "msg",
+                "to": "DOCKER_INFLUXDB_PORT",
+                "tot": "env"
+            },
+            {
+                "t": "set",
+                "p": "token",
+                "pt": "msg",
+                "to": "DOCKER_INFLUXDB_INIT_ADMIN_TOKEN",
+                "tot": "env"
+            },
+            {
+                "t": "set",
+                "p": "org",
+                "pt": "msg",
+                "to": "DOCKER_INFLUXDB_INIT_ORG",
+                "tot": "env"
+            },
+            {
+                "t": "set",
+                "p": "bucket",
+                "pt": "msg",
+                "to": "DOCKER_INFLUXDB_INIT_BUCKET",
+                "tot": "env"
+            },
+            {
+                "t": "delete",
+                "p": "headers",
+                "pt": "msg"
+            },
+            {
+                "t": "set",
+                "p": "headers['Authorization']",
+                "pt": "msg",
+                "to": "'Token ' & token",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "headers['Content-Type']",
+                "pt": "msg",
+                "to": "application/vnd.flux",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "url",
+                "pt": "msg",
+                "to": "'http://' & host & \":\" & port & '/api/v2/query?org=' & org",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 290,
+        "y": 100,
+        "wires": [
+            [
+                "75a19a2a9044762a"
+            ]
+        ]
+    },
+    {
+        "id": "518fed4459cb2871",
+        "type": "switch",
+        "z": "5f29c2aa74a1924f",
+        "name": "Check statusCode (Do not edit)",
+        "property": "statusCode",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "200",
+                "vt": "num"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 550,
+        "y": 340,
+        "wires": [
+            [
+                "cfa298fa9639bdaf"
+            ],
+            [
+                "7050d81dfcef4c51"
+            ]
+        ]
+    },
+    {
+        "id": "7050d81dfcef4c51",
+        "type": "debug",
+        "z": "5f29c2aa74a1924f",
+        "name": "Error",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 850,
+        "y": 380,
+        "wires": []
+    }
+]

@@ -1,0 +1,112 @@
+version: "3"
+
+volumes:
+   nodered:
+   influxdbv2:
+   grafana:
+# If conf files are stored in volumes they will persist when 
+# rebuilding the image. and we don't want that.
+#   telegraf:
+#   mosquitto_config:
+   mosquitto_data:
+   mosquitto_log:
+
+networks:
+   logger:
+
+services:
+   mosquitto:
+      container_name: mosquitto
+      build: ./mosquitto
+      networks:
+         - logger
+      ports:
+         - "1883:1883"
+      volumes:
+         - mosquitto_data:/mosquitto/data 
+#         - mosquitto_config:/mosquitto/config
+         - mosquitto_log:/mosquitto/log
+      restart: on-failure
+
+   nodered:
+      container_name: nodered
+      build: ./nodered
+      depends_on:
+         - mosquitto
+      environment:
+         - TZ=Europe/Stockholm
+         - DOCKER_INFLUXDB_INIT_ORG=${DOCKER_INFLUXDB_INIT_ORG}
+         - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=${DOCKER_INFLUXDB_INIT_ADMIN_TOKEN}
+         - DOCKER_INFLUXDB_INIT_BUCKET=${DOCKER_INFLUXDB_INIT_BUCKET}
+         - DOCKER_INFLUXDB_HOST=${DOCKER_INFLUXDB_HOST}
+         - DOCKER_INFLUXDB_PORT=${DOCKER_INFLUXDB_PORT}
+         - DOCKER_MOSQUITTO_HOST=${DOCKER_MOSQUITTO_HOST}
+         - DOCKER_MOSQUITTO_PORT=${DOCKER_MOSQUITTO_PORT}
+
+      networks:
+         - logger
+      ports:
+         - "1880:1880"
+      volumes:
+         - nodered:/data 
+      restart: on-failure
+   influxdb:
+      image: influxdb
+      container_name: influxdb
+      networks:
+         - logger
+      ports:
+         - "8086:8086"
+      volumes:
+         - influxdbv2:/var/lib/influxdb2:rw
+#    healthcheck:
+#      test: [ "CMD", "curl", "-f", "http://localhost:8086" ]
+#      interval: 30s
+#      timeout: 10s
+#      retries: 5
+      environment:
+         - DOCKER_INFLUXDB_INIT_MODE=${DOCKER_INFLUXDB_INIT_MODE}
+         - DOCKER_INFLUXDB_INIT_USERNAME=${DOCKER_INFLUXDB_INIT_USERNAME}
+         - DOCKER_INFLUXDB_INIT_PASSWORD=${DOCKER_INFLUXDB_INIT_PASSWORD}
+         - DOCKER_INFLUXDB_INIT_ORG=${DOCKER_INFLUXDB_INIT_ORG}
+         - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=${DOCKER_INFLUXDB_INIT_ADMIN_TOKEN}
+         - DOCKER_INFLUXDB_INIT_BUCKET=${DOCKER_INFLUXDB_INIT_BUCKET}
+      restart: on-failure
+
+   telegraf:
+      container_name: telegraf
+      build: ./telegraf
+      depends_on:
+         - influxdb
+         - mosquitto
+      networks:
+         - logger
+#      volumes:
+#         - telegraf:/etc/telegraf:ro
+      environment:
+         - DOCKER_INFLUXDB_INIT_ORG=${DOCKER_INFLUXDB_INIT_ORG}
+         - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=${DOCKER_INFLUXDB_INIT_ADMIN_TOKEN}
+         - DOCKER_INFLUXDB_INIT_BUCKET=${DOCKER_INFLUXDB_INIT_BUCKET}
+         - DOCKER_INFLUXDB_HOST=${DOCKER_INFLUXDB_HOST}
+         - DOCKER_INFLUXDB_PORT=${DOCKER_INFLUXDB_PORT}
+         - DOCKER_MOSQUITTO_HOST=${DOCKER_MOSQUITTO_HOST}
+         - DOCKER_MOSQUITTO_PORT=${DOCKER_MOSQUITTO_PORT}
+      restart: on-failure
+
+   grafana:
+      container_name: grafana
+      build: ./grafana
+      depends_on:
+         - influxdb
+      networks:
+         - logger
+      ports:
+         - "3000:3000"
+      environment:
+         - DOCKER_INFLUXDB_HOST=${DOCKER_INFLUXDB_HOST}
+         - DOCKER_INFLUXDB_PORT=${DOCKER_INFLUXDB_PORT}
+         - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=${DOCKER_INFLUXDB_INIT_ADMIN_TOKEN}
+         - DOCKER_INFLUXDB_INIT_BUCKET=${DOCKER_INFLUXDB_INIT_BUCKET}
+      volumes:
+         - grafana:/var/lib/grafana
+      restart: on-failure
