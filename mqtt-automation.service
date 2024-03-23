@@ -1,5 +1,5 @@
-# /etc/systemd/system/docker-mqtt-automation.service
-# systemctl enable docker-mqtt-automation
+# /etc/systemd/system/mqtt-automation.service
+# systemctl enable mqtt-automation
 
 [Unit]
 Description=MQTT Automation Service
@@ -10,8 +10,11 @@ After=docker.service
 Type=oneshot
 RemainAfterExit=yes
 WorkingDirectory=/home/admin/docker-mqtt-automation
-ExecStart=/usr/local/bin/docker-compose up -d
-ExecStop=/usr/local/bin/docker-compose down
+#ExecStart=/usr/local/bin/docker-compose up -d
+#ExecStop=/usr/local/bin/docker-compose down
+ExecStart=docker-compose up -d
+ExecStop=docker-compose down
+
 TimeoutStartSec=0
 
 [Install]
