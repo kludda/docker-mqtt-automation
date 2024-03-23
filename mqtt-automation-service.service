@@ -1,5 +1,5 @@
-# /etc/systemd/system/data-logger-stack.service
-# systemctl enable data-logger-stack
+# /etc/systemd/system/docker-mqtt-automation.service
+# systemctl enable docker-mqtt-automation
 
 [Unit]
 Description=MQTT Automation Service
@@ -9,7 +9,7 @@ After=docker.service
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-WorkingDirectory=/home/root/docker-mqtt-automation
+WorkingDirectory=/home/admin/docker-mqtt-automation
 ExecStart=/usr/local/bin/docker-compose up -d
 ExecStop=/usr/local/bin/docker-compose down
 TimeoutStartSec=0

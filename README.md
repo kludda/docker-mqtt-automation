@@ -117,6 +117,7 @@ To show more info in the label in the legend add a `GROUP BY`.
 SELECT "temperature" FROM "thermostat" WHERE ("device"::tag = 'device123') AND $timeFilter GROUP BY "device"::tag
 ```
 
+Home -> Dashboards -> New -> Import
 
 ### InfluxDB admin interface
 
@@ -189,6 +190,7 @@ Clone repo:
 
 ```
 $ cd $HOME
+$ git clone https://github.com/kludda/docker-mqtt-automation.git
 $ git clone https://github.com/kludda/data-logger-stack.git --branch rpi
 $ cd data-logger-stack
 ```
@@ -300,7 +302,7 @@ $ docker compose down
 and, if you also want to delete the persisted files: 
 
 ```
-$ docker volume prune
+$ docker volume prune -a
 ```
 
 List images 
@@ -313,6 +315,11 @@ Remove images
 ```
 $ docker image rm myimagename
 ```
+
+```
+$ docker image prune -a
+```
+
 
 ## Components
 
