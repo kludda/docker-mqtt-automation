@@ -178,6 +178,8 @@ This message shows that your installation appears to be working correctly.
 
 ```
 
+
+
 ### Checkout the repo
 
 Install git
@@ -196,7 +198,14 @@ $ cd data-logger-stack
 ```
 
 
+### Install service
 
+
+```
+$ sudo cp mqtt-automation.service /etc/systemd/system/
+$ sudo systemctl enable mqtt-automation
+$ sudo systemctl start mqtt-automation
+```
 
 
 
@@ -207,7 +216,7 @@ Run the containers detached:
 ```
 $ docker compose up -d
 ```
-
+systemctl start mqtt-automation
 
 ## Maintenance 
 
@@ -235,7 +244,8 @@ docker compose build --no-cache mosquitto
 ```
 
 
-
+git reset --hard HEAD
+git pull
 
 
 
