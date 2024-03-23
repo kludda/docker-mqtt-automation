@@ -3,9 +3,6 @@ FROM nodered/node-red
 # Copy example flows
 COPY ./flows.json /data/flows.json
 
-# Get latsest npm
-RUN npm update -g
-
 # Install the dashboard
 RUN npm install node-red-dashboard
 
