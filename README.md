@@ -16,9 +16,9 @@ The stack contains:
 
 ## Installation
 
-The instructions asumes you are working from the command line.
+These instructions asumes you are working from the command line.
 
-### Install Docker
+### Install `docker`
 
 Install `docker` using the convinience script and add your user to the docker group:
 
@@ -50,7 +50,7 @@ This message shows that your installation appears to be working correctly.
 ```
 
 
-### Install Git
+### Install `git`
 
 Install `git`
 
@@ -60,22 +60,20 @@ $ sudo apt install git
 
 ### Clone this repository
 
-Clone repository and cd into it:
+Clone repository:
 
 ```
 $ cd $HOME
 $ git clone https://github.com/kludda/docker-mqtt-automation.git
-$ cd docker-mqtt-automation
+
 ```
 
 
 ### Running the app using `systemctl`
 
-The app can be installed by installing a `systemmd` service using the provided script. The app is restarted on boot.
+The app can be installed by installing a `systemd` service using the provided script. The app will then be restarted on boot.
 
-`docker` will build the images the first time the service is started which takes a significant time. Starting the containers also takes quite some time.
-
-The `systemctl` command is quiet so you will not see the startup process.
+`docker` will build the images the first time the service is started which takes a significant time. Starting the containers also takes quite some time. The `systemctl` command is quiet so you will not see the startup process.
 
 Go to the app folder:
 ```
@@ -87,12 +85,12 @@ Install the service:
 $ sudo sh install-service.sh
 ```
 
-Start the app:
+To start the app run:
 ```
 $ sudo systemctl start mqtt-automation
 ```
 
-Stop the app:
+To stop the app run:
 ```
 $ sudo systemctl stop mqtt-automation
 ```
@@ -107,7 +105,7 @@ Go to the app folder:
 $ cd $HOME/docker-mqtt-automation
 ```
 
-Start the app:
+To start the app run:
 ```
 $ docker compose up -d
 ```
@@ -117,14 +115,14 @@ If you want the to see the output from the containers for debuging purpose, star
 $ docker compose up
 ```
 
-Stop the app:
+To stop the app run:
 ```
 $ docker compose down
 ```
 
-The app will not restart on reboot.
+The app will not restart on reboot when using this method.
 
-You can install the service and use the `systemctl` to control the app instead at any stage.
+You can install the service and use the `systemctl` command to control the app instead at any stage.
 
 
 ## Usage
@@ -181,10 +179,10 @@ Node-RED serves a web interface on port 1880 of your host manchine, e.g. http://
 Control UI is the Node-RED dashboard. The additional node `node-red-dashboard` is installed by default.
 
 
-#### Write datapoint to InfluxDB in NodeRED
+#### Write datapoint to InfluxDB in Node-RED
 In the Node-RED environment there is a "catch-all" MQTT example flow that compose a InfluxDB line protocol from the topic structure and publish this to `influxdb/write`. 
 
-MQTT topic convention:
+MQTT topic convention (from above):
 ```
 <root topic>/<device>/<node>/<property>
 home/device123/thermostat/temperature -> 23
@@ -228,37 +226,29 @@ In Grafana a query would look like this:
 SELECT "temperature" FROM "thermostat" WHERE ("device"::tag = 'device123') AND $timeFilter
 ```
 
-To show more info in the label in the legend add a `GROUP BY`.
+To show more info in the label in the of a graph legend, add a `GROUP BY`.
 ```
 SELECT "temperature" FROM "thermostat" WHERE ("device"::tag = 'device123') AND $timeFilter GROUP BY "device"::tag
 ```
+
+An example dashboard is provided in the grafana folder. To import the dashboard follow this process in the Grafana UI:
 
 Home -> Dashboards -> New -> Import
 
 ### InfluxDB admin interface
 
-InfluxDB serves a web interface on port 8086 of your host machine, e.g. http://localhost:8086. A user and bucket is setup by default first time `docker compose up` is run.
+InfluxDB serves a web interface on port 8086 of your host machine, e.g. http://localhost:8086. A user and bucket is setup by default first time the app is run.
 
 
 ### Mosquitto
 
 Mosquitto will be listening on port 1883 of your host machine and is already configured by default.
 
-You can use any MQTT client to connect to it. Using debian and `mosquitto-client` utilities is as simple as:
-
-```
-$ sudo apt install mosquitto-clients
-$ mosquitto_sub -v -t /mytopic &
-$ mosquitto_pub -t /mytopic -m hello
-```
-
 
 ## Maintenance 
 
 
 ### Update the app
-
-TBD: rm images and rebuild..
 
 If the repository gets updated and you want to have the latest changes you can do it without losing any info in your persisted volumes. Only stop, pull the changes and start again the containers:
 
@@ -279,12 +269,12 @@ If you made changes to the files in the repository the `git pull` will not work.
 git reset --hard HEAD
 ```
 
-Update ypu copy of the repository:
+Update your copy of the repository:
 ```
 $ git pull
 ```
 
-Get latest images. It might be that latest images have changes that breaks this app so maybe do this only if your experiencing bugs.
+Get latest images. It might be that latest images have changes that breaks this app so maybe do this only if you are experiencing bugs in the softwares.
 ```
 $ docker compose pull
 ```
@@ -335,19 +325,19 @@ or
 $ docker compose down
 ```
 
-Uninstall the service if it was installed:
+Uninstall the service if it was installed using the provided script:
 ```
 $ sudo sh uninstall-service.sh
 ```
 
-If you want to delete the persisted files:
+Delete the persisted files, if you want.
 WARNING: The data will be lost.
-WARNING: This command delete ALL volumes not currently attached to a container. Be carefull if you have other docker container on your system except this app.
+WARNING: This command delete ALL volumes not currently attached to a container. Be carefull if you have other docker containers on your system except this app.
 ```
 $ docker volume prune -a
 ```
 
-Remove images:
+Remove images.
 WARNING: This command delete ALL images not currently used by a container.
 ```
 $ docker image prune -a
@@ -359,16 +349,18 @@ $ cd ..
 $ rm -R docker-mqtt-automation
 ```
 
+All files associated with this app should now be removed from your host machine.
 
 
 ### Working with Docker
+
+A few commands as note for myself.
 
 #### Running containers
 
 See runnning containers 
 ```
 $ docker ps
-
 ```
 
 #### Volumes
