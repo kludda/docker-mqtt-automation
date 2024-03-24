@@ -196,7 +196,7 @@ Example:
 ```
 thermostat,device=device123 temperature=23
 ```
-#### Read datapoint from InfluxDB in NodeRED
+#### Read datapoint from InfluxDB in Node-RED
 
 In the Node-RED environment there is an example flow that reads datapoint(s) from InfluxDB.
 
@@ -354,18 +354,18 @@ All files associated with this app should now be removed from your host machine.
 `docker` and `git` are still installed on your host machine.
 
 
-### Working with Docker
+## Working with Docker
 
 A few commands as note for myself.
 
-#### Running containers
+### Containers
 
 See runnning containers 
 ```
 $ docker ps
 ```
 
-#### Volumes
+### Volumes
 
 See volumes 
 ```
@@ -377,7 +377,7 @@ Inspect volumes, e.g. see their location in your drive:
 $ docker volume inspect myvolumename
 ```
 
-#### Images
+### Images
 
 List images:
 ```
