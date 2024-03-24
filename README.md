@@ -1,6 +1,8 @@
-# Data logger stack
+# MQTT Automation
 
-This repository contains a data logger stack intended for quick setup in a closed R&D environment for the purpose of logging of test.
+Thiss Docker app contains an automation, data logger and vizualization stack intended for quick setup in a closed R&D environment or home network.
+
+The stack contains:
 
 * [Mosquitto](https://mosquitto.org/)
 * [Node-RED](https://nodered.org/)
@@ -8,8 +10,122 @@ This repository contains a data logger stack intended for quick setup in a close
 * [Telegraf](https://www.influxdata.com/time-series-platform/telegraf/)
 * [Grafana](https://grafana.com/)
 
-> [!CAUTION]
-> This stack is not secured.
+> [!WARNING]
+> This Docker app is unsecure.
+
+
+## Installation
+
+The instructions asumes you are working from the command line.
+
+### Install Docker
+
+Install `docker` using the convinience script and add your user to the docker group:
+
+```
+$ curl -sSL https://get.docker.com/ | sh
+$ sudo usermod -aG docker $USER
+```
+
+Logout and login to apply. Or run:
+
+```
+$ sudo su $USER
+```
+
+And check that it is working:
+
+```
+$ docker run hello-world
+Unable to find image 'hello-world:latest' locally
+latest: Pulling from library/hello-world
+1b930d010525: Pull complete 
+Digest: sha256:2557e3c07ed1e38f26e389462d03ed943586f744621577a99efb77324b0fe535
+Status: Downloaded newer image for hello-world:latest
+
+Hello from Docker!
+This message shows that your installation appears to be working correctly.
+...
+
+```
+
+
+### Install Git
+
+Install `git`
+
+```
+$ sudo apt install git
+```
+
+### Clone this repository
+
+Clone repository and cd into it:
+
+```
+$ cd $HOME
+$ git clone https://github.com/kludda/docker-mqtt-automation.git
+$ cd docker-mqtt-automation
+```
+
+
+### Running the app using `systemctl`
+
+The app can be installed by installing a `systemmd` service using the provided script. The app is restarted on boot.
+
+`docker` will build the images the first time the service is started which takes a significant time. Starting the containers also takes quite some time.
+
+The `systemctl` command is quiet so you will not see the startup process.
+
+Go to the app folder:
+```
+$ cd $HOME/docker-mqtt-automation
+```
+
+Install the service:
+```
+$ sudo sh install-service.sh
+```
+
+Start the app:
+```
+$ sudo systemctl start mqtt-automation
+```
+
+Stop the app:
+```
+$ sudo systemctl stop mqtt-automation
+```
+
+
+### Running the app using `docker compose`
+
+Alternatively to the above the app can be run using the `docker compose` command.
+
+Go to the app folder:
+```
+$ cd $HOME/docker-mqtt-automation
+```
+
+Start the app:
+```
+$ docker compose up -d
+```
+
+If you want the to see the output from the containers for debuging purpose, start the containers attached:
+```
+$ docker compose up
+```
+
+Stop the app:
+```
+$ docker compose down
+```
+
+The app will not restart on reboot.
+
+You can install the service and use the `systemctl` to control the app instead at any stage.
+
 
 ## Usage
 
@@ -137,115 +253,111 @@ $ mosquitto_pub -t /mytopic -m hello
 ```
 
 
-## Installation 
-
-The instructions below will asume you are working from the command line.
-
-### Install docker
-
-Installing `docker` using the convinience script:
-
-```
-$ curl -sSL https://get.docker.com/ | sh
-```
-
-Add your user to the docker group:
-
-```
-$ sudo usermod -aG docker $USER
-```
-
-Logout and login to apply. Or run:
-
-```
-$ sudo su $USER
-```
-
-And check it is working:
-
-```
-$ docker run hello-world
-Unable to find image 'hello-world:latest' locally
-latest: Pulling from library/hello-world
-1b930d010525: Pull complete 
-Digest: sha256:2557e3c07ed1e38f26e389462d03ed943586f744621577a99efb77324b0fe535
-Status: Downloaded newer image for hello-world:latest
-
-Hello from Docker!
-This message shows that your installation appears to be working correctly.
-
-...
-
-```
-
-
-
-### Checkout the repo
-
-Install git
-
-```
-$ sudo apt install git
-```
-
-Clone repo:
-
-```
-$ cd $HOME
-$ git clone https://github.com/kludda/docker-mqtt-automation.git
-$ git clone https://github.com/kludda/data-logger-stack.git --branch rpi
-$ cd data-logger-stack
-```
-
-
-### Install service
-
-
-```
-$ sudo cp mqtt-automation.service /etc/systemd/system/
-$ sudo systemctl enable mqtt-automation
-$ sudo systemctl start mqtt-automation
-```
-
-
-
-### Run the project
-
-Run the containers detached:
-
-```
-$ docker compose up -d
-```
-systemctl start mqtt-automation
-
 ## Maintenance 
 
 
-### Update the project
+### Update the app
 
 TBD: rm images and rebuild..
 
 If the repository gets updated and you want to have the latest changes you can do it without losing any info in your persisted volumes. Only stop, pull the changes and start again the containers:
 
-chmod +x update-conf.sh 
-
-
+Go to the app folder:
 ```
-$ cd $HOME/data-logger-stack
-$ docker compose stop
+$ cd $HOME/docker-mqtt-automation
+```
+
+Stop the app according to the method it was started:
+```
+$ sudo systemctl stop mqtt-automation
+or
+$ docker compose down
+```
+
+If you made changes to the files in the repository the `git pull` will not work. Copy those files to outside the repository (if you want) and reset the repository. WARNING: your changes in the repository will be lost!
+```
+git reset --hard HEAD
+```
+
+Update ypu copy of the repository:
+```
 $ git pull
+```
+
+Get latest images. It might be that latest images have changes that breaks this app so maybe do this only if your experiencing bugs.
+```
 $ docker compose pull
+```
+
+Start the app:
+```
+$ sudo systemctl start mqtt-automation
+or
 $ docker compose up -d
 ```
-If e.g. a config file has changed the image needs to be built.
-The --no-cache option is needed else old config is used.
+
+If a config file has changed it will not be updated since it already exist in the persisting volume. If you want to update the configuration file of a software you can do so with the provided script. The containers must be running. WARNING: This will overwrite any changes you have made to the configuration file!
+
 ```
-docker compose build --no-cache mosquitto
+$ cd telegraf
+$ sh update-conf.sh
+$ cd ..
+```
+
+If you want to update all the configuration files you can do so with the provided script. The containers must be running. WARNING: This will overwrite any changes you have made to the configuration files!
+
+```
+$ sh update-all-conf.sh
+```
+
+Restart the app for the changes to take effect:
+```
+$ docker compose restart
 ```
 
 
-git reset --hard HEAD
-git pull
+### Backing up the app
+
+To be completed.
+
+
+## Uninstall
+
+Go to the app folder:
+```
+$ cd $HOME/docker-mqtt-automation
+```
+
+Stop the app according to the method it was started:
+```
+$ sudo systemctl stop mqtt-automation
+or
+$ docker compose down
+```
+
+Uninstall the service if it was installed:
+```
+$ sudo sh uninstall-service.sh
+```
+
+If you want to delete the persisted files:
+WARNING: The data will be lost.
+WARNING: This command delete ALL volumes not currently attached to a container. Be carefull if you have other docker container on your system except this app.
+```
+$ docker volume prune -a
+```
+
+Remove images:
+WARNING: This command delete ALL images not currently used by a container.
+```
+$ docker image prune -a
+```
+
+Remove repository:
+```
+$ cd ..
+$ rm -R docker-mqtt-automation
+```
 
 
 
@@ -254,7 +366,6 @@ git pull
 #### Running containers
 
 See runnning containers 
-
 ```
 $ docker ps
 
@@ -263,79 +374,32 @@ $ docker ps
 #### Volumes
 
 See volumes 
-
 ```
 $ docker volume ls
 ```
 
 Inspect volumes, e.g. see their location in your drive:
-
 ```
 $ docker volume inspect myvolumename
 ```
 
+#### Images
 
-#### Bringing up
-In the folder, where the `docker-composer.yml` file is.
-
-
-
-#### Starting and stoping
-
-In the folder, where the `docker-composer.yml` file is.
-
-
-Stop containers:
-
-```
-$ docker compose stop
-```
-
-start them again 
-
-```
-$ docker compose start
-```
-
-
-#### Taking down
-In the folder, where the `docker-composer.yml` file is.
-
-
-
-To remove the project from your drive: 
-
-```
-$ docker compose down
-```
-
-and, if you also want to delete the persisted files: 
-
-```
-$ docker volume prune -a
-```
-
-List images 
-
+List images:
 ```
 $ docker image ls
 ```
-Remove images
 
+Remove image (triggers a rebuild on bringing a docker app up):
 ```
 $ docker image rm myimagename
 ```
 
-```
-$ docker image prune -a
-```
-
-
-## Components
 
 
 
 ## Installation of Raspberry Pi OS
+(Notes for myself)
 
 Insert SD card in computer
 
