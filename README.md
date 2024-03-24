@@ -122,7 +122,7 @@ $ docker compose down
 
 The app will not restart on reboot when using this method.
 
-You can install the service and use the `systemctl` command to control the app instead at any stage.
+Stop the app before you install the service and use the `systemctl` command to control the app instead.
 
 
 ## Usage
@@ -325,7 +325,7 @@ or
 $ docker compose down
 ```
 
-Uninstall the service if it was installed using the provided script:
+Uninstall the service if it was installed using the provided script. You will probably se a few errors "rm: cannot remove...", that is ok.
 ```
 $ sudo sh uninstall-service.sh
 ```
@@ -346,10 +346,12 @@ $ docker image prune -a
 Remove repository:
 ```
 $ cd ..
-$ rm -R docker-mqtt-automation
+$ rm -Rf docker-mqtt-automation
 ```
 
 All files associated with this app should now be removed from your host machine.
+
+`docker` and `git` are still installed on your host machine.
 
 
 ### Working with Docker
