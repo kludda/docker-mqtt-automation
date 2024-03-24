@@ -80,7 +80,7 @@ services:
       networks:
          - mqtt_automation
       volumes:
-         - telegraf:/etc/telegraf:ro
+         - telegraf:/etc/telegraf
       environment:
          - DOCKER_INFLUXDB_INIT_ORG=${DOCKER_INFLUXDB_INIT_ORG}
          - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=${DOCKER_INFLUXDB_INIT_ADMIN_TOKEN}
