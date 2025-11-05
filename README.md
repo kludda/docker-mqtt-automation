@@ -10,9 +10,9 @@ The stack contains:
 * [Telegraf](https://www.influxdata.com/time-series-platform/telegraf/)
 * [Grafana](https://grafana.com/)
 
-> [!WARNING]
-> This Docker app is unsecure.
+> **Caution:** This app have a minimum of access credentials configured, and the ons used are exposed in this repository. Never expose the app to the Internet.
 
+&#x2615; [Buy me a coffee :)](https://paypal.me/davidalind)
 
 ## Installation
 
